@@ -8,114 +8,124 @@ def drawn_card():
     random.shuffle(deck)
     return random.choice(deck)[0]
 
-def c_score(hand):
-    global computer_score
+def computer_score(hand):
+    global c_score
     has_ace = False
     while True:
         for card in hand:
             if card == 'ace':
                 has_ace = True
             elif card == 'jack' or card == 'queen' or card == 'king':
-                computer_score += 10
+                c_score += 10
             else:
-                computer_score += int(card)
+                c_score += int(card)
         
         if has_ace:
-            if computer_score in [11, 12, 13, 14, 15] or computer_score <= 5:
-                hand.append(drawn_card())
-                computer_score = 0
+            if c_score <= 5 or 11 <= c_score <= 15:
+                computer_hand.append(drawn_card())
+                c_score = 0
                 continue
-            elif computer_score in [6, 7, 8, 9, 10]:
-                computer_score += 11
+            elif 6 <= c_score <= 10:
+                c_score += 11
                 break
             else:
-                computer_score += 1
+                c_score += 1
                 break
-
-        if computer_score <= 15 and 'ace' not in hand:
-            hand.append(drawn_card())
-            computer_score = 0
+        
+        if c_score <= 15:
+            computer_hand.append(drawn_card())
+            c_score = 0
             continue
         else:
             break
-    return computer_score
 
-def u_score(hand):
-    global user_score
+def user_score(hand):
+    global u_score
     has_ace = False
     while True:
         for card in hand:
             if card == 'ace':
                 has_ace = True
             elif card == 'jack' or card == 'queen' or card == 'king':
-                user_score += 10
+                u_score += 10
             else:
-                user_score += int(card)
-        print(f"Your cards: {hand}, current score: {user_score}")
+                u_score += int(card)
+        print(f"Your cards: {hand}, current score: {u_score}")
 
         if has_ace:
-            want_card = input("Do you want to get a card? Type (yes/no): ").lower()
-            if want_card != 'no':
-                hand.append(drawn_card())
-                user_score = 0
+            want_card = input("Do you want another card? type (y/n) ").lower()
+            if want_card != 'n':
+                user_hand.append(drawn_card())
+                u_score = 0
                 continue
             else:
                 ace = 0
                 for card in hand:
                     if card == 'ace':
                         ace += 1
-                
                 if ace == 1:
-                    ace_point = int(input("What point do you want for ace?: "))
-                    if ace_point == 11:
-                        user_score += 11
+                    ace_point = int(input("What point do you want for ace? "))
+                    if ace_point == 1:
+                        u_score += 1
+                        break
                     else:
-                        user_score += 1
+                        u_score += 11
+                        break
                 else:
                     while True:
                         ace_point = int(input("What point do you want for ace?: "))
                         if ace_point == 11:
-                            user_score += 11
+                            u_score += 11
+                            break
                         else:
-                            user_score += 1
+                            u_score += 1
                         ace -= 1
                         if ace == 0:
                             break
                 break
         else:
-            want_card = input("Do you want to get a card? Type (yes/no): ").lower()
-            if want_card != 'no':
-                hand.append(drawn_card())
-                user_score = 0
+            want_card = input("Do you want another card? type (y/n) ").lower()
+            if want_card != 'n':
+                user_hand.append(drawn_card())
+                u_score = 0
                 continue
             else:
                 break
 
-def compare(machine, user):
-    if user == machine:
+def compare(computer, user):
+    if user == computer:
         return "Draw 🙃"
+    elif user == computer and user > 21:
+        return "You went over. You lose 😭"
     elif user > 21:
         return "You went over. You lose 😭"
-    elif machine > 21:
+    elif computer > 21:
         return "Opponent went over. You win 😁"
-    elif user > machine:
+    elif user > computer:
         return "You win 😃"
     else:
         return "You lose 😤"
+    
 
-while input("Do you want to play a game of Blackjack? Type (yes/no): ").lower() == 'yes':
+while True:
     computer_hand = []
     user_hand = []
+    c_score = 0
+    u_score = 0
     for _ in range(2):
         computer_hand.append(drawn_card())
         user_hand.append(drawn_card())
 
-    computer_score = 0
-    user_score = 0
-
-    c_score(computer_hand)
+    computer_score(computer_hand)
     print(f"Computer's first card: {computer_hand[0]}")
-    u_score(user_hand)
-    print(f"Computer's final hand: {computer_hand}, final score: {computer_score}")
-    print(f"Your final hand: {user_hand}, final score: {user_score}")
-    print(compare(computer_score, user_score))
+    user_score(user_hand)
+
+    print(f"Computer's final hand: {computer_hand}, final score: {c_score}")
+    print(f"Your final hand: {user_hand}, final score: {u_score}")
+    print(compare(c_score, u_score))
+
+    if input("Play again? type (y/n) ").lower() != 'y':
+        break
+    else:
+        computer_hand.clear()
+        user_hand.clear()
